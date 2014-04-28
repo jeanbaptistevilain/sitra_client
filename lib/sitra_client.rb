@@ -1,5 +1,6 @@
 require 'sitra_client/version'
 require 'sitra_client/sitra_query'
+require 'sitra_client/sitra_response'
 require 'open-uri'
 
 module SitraClient
@@ -23,13 +24,13 @@ module SitraClient
   end
 
   def self.query(criteria = {})
-    results = []
+    response = SitraResponse.new
     query = SitraQuery.new(@config[:api_key], @config[:site_identifier], criteria)
     puts "#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{query.to_params}"
     open("#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{CGI.escape query.to_params}") { |f|
-      f.each_line {|line| results << line}
+      f.each_line {|line| response.append_line(line)}
     }
-    results
+    response.as_hash
   end
 
 end

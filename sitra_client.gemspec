@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["jeanbaptistevilain"]
   spec.email         = ["jbvilain@gmail.com"]
   spec.description   = %q{Sitra Client Gem}
-  spec.summary       = %q{This gem wraps the SITRA JSON API}
+  spec.summary       = %q{A simple Ruby wrapper for the SITRA JSON api}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,5 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
-  spec.add_runtime_dependency "activemodel", "3.2.14"
+  spec.add_development_dependency "test-unit"
+  spec.add_development_dependency "shoulda"
+  spec.add_runtime_dependency "json"
 end
