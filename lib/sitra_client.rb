@@ -13,6 +13,7 @@ module SitraClient
   }
 
   @valid_config_keys = @config.keys
+  @logger = Logger.new(STDOUT)
 
   # Configure through hash
   def self.configure(opts = {})
@@ -26,11 +27,11 @@ module SitraClient
   def self.query(criteria = {})
     response = SitraResponse.new
     query = SitraQuery.new(@config[:api_key], @config[:site_identifier], criteria)
-    puts "#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{query.to_params}"
+    @logger.info "Search query : #{@config[:base_url]}/recherche/list-objets-touristiques?query=#{query.to_params}"
     open("#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{CGI.escape query.to_params}") { |f|
       f.each_line {|line| response.append_line(line)}
     }
-    response.as_hash
+    response
   end
 
 end
