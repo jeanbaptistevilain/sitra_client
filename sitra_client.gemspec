@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = SitraClient::VERSION
   spec.authors       = ["jeanbaptistevilain"]
   spec.email         = ["jbvilain@gmail.com"]
-  spec.description   = %q{Sitra Client Gem}
-  spec.summary       = %q{A simple Ruby wrapper for the SITRA JSON api}
-  spec.homepage      = ""
+  spec.description   = "Sitra Client Gem"
+  spec.summary       = "A simple Ruby wrapper for the SITRA JSON api"
+  spec.homepage      = "https://github.com/jeanbaptistevilain/sitra_client"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

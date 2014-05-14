@@ -3,8 +3,6 @@ require 'json'
 
 class SitraResponse
 
-  include AttributeHelper
-
   def initialize
     @json_response = ''
   end
