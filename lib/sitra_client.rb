@@ -2,6 +2,7 @@ require 'sitra_client/version'
 require 'sitra_client/sitra_query'
 require 'sitra_client/sitra_response'
 require 'open-uri'
+require 'logger'
 
 module SitraClient
 
