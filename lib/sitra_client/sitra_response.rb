@@ -1,4 +1,5 @@
 require 'sitra_client/attribute_helper'
+require 'sitra_client/touristic_object'
 require 'json'
 
 class SitraResponse
@@ -17,6 +18,16 @@ class SitraResponse
 
   def as_raw_json
     @json_response
+  end
+
+  def as_array
+    response = as_hash
+    if response[:objetsTouristiques].nil?
+      results = []
+    else
+      results = response[:objetsTouristiques].collect {|obj_hash| TouristicObject.new(obj_hash)}
+    end
+    results
   end
 
 end

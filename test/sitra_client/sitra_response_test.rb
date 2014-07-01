@@ -34,4 +34,33 @@ class SitraResponseTest < Test::Unit::TestCase
 
   end
 
+  should 'return an array of touristic objects' do
+
+    json_response = '{ "numFound" : 2, "objetsTouristiques" : [ {"id" : 1, "nom" : {"libelleFr" : "my_first_object"} }, {"id" : 2, "nom" : {"libelleFr" : "my_second_object"} } ] }'
+
+    sitra_response = SitraResponse.new
+    sitra_response.append_line(json_response)
+
+    touristic_objects = sitra_response.as_array
+
+    assert_equal 2, touristic_objects.length
+    assert_equal "1", touristic_objects[0].id
+    assert_equal "my_first_object", touristic_objects[0].title
+    assert_equal "2", touristic_objects[1].id
+    assert_equal "my_second_object", touristic_objects[1].title
+
+  end
+
+  should 'return empty array when no data is available' do
+
+    json_response = '{ "numFound" : 2 }'
+
+    sitra_response = SitraResponse.new
+    sitra_response.append_line(json_response)
+
+    touristic_objects = sitra_response.as_array
+    assert_empty touristic_objects
+
+  end
+
 end
