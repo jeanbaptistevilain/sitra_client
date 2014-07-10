@@ -131,4 +131,25 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_true touristic_object.adapted_tourism.include?('Accessible en fauteuil roulant en autonomie')
   end
 
+  should 'retrieve merged general and specific information' do
+    hash_result = {
+        :type => 'ACTIVITE',
+        :informations => {
+            :moyensCommunication => [
+                {:type => {:libelleFr => "Téléphone"}, :coordonnee => "0123456789"}
+            ]
+        },
+        :informationsActivite => {
+            :commerceEtServicePrestataire => {
+                :nom => {:libelleFr => "my_service"}
+            }
+        }
+    }
+
+    touristic_object = TouristicObject.new(hash_result)
+
+    assert_equal "0123456789", touristic_object.information[:moyensCommunication][0][:coordonnee]
+    assert_equal "my_service", touristic_object.information[:commerceEtServicePrestataire][:nom][:libelleFr]
+  end
+
 end

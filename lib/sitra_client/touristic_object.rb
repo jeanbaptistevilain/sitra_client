@@ -5,6 +5,25 @@ class TouristicObject
 
   include AttributeHelper
 
+  SPECIFIC_INFOS = {
+    'ACTIVITE' => '@informationsActivite',
+    'COMMERCE_ET_SERVICE' => '@informationsCommerceEtService',
+    'DEGUSTATION' => '@informationsDegustation',
+    'DOMAINE_SKIABLE' => '@informationsDomaineSkiable',
+    'EQUIPEMENT' => '@informationsEquipement',
+    'FETE_ET_MANIFESTATION' => '@informationsFeteEtManifestation',
+    'HEBERGEMENT_COLLECTIF' => '@informationsHebergementCollectif',
+    'HEBERGEMENT_LOCATIF' => '@informationsHebergementLocatif',
+    'HOTELLERIE' => '@informationsHotellerie',
+    'HOTELLERIE_PLEIN_AIR' => '@informationsHotelleriePleinAir',
+    'PATRIMOINE_CULTUREL' => '@informationsPatrimoineCulturel',
+    'PATRIMOINE_NATUREL' => '@informationsPatrimoineNaturel',
+    'RESTAURATION' => '@informationsRestauration',
+    'SEJOUR_PACKAGE' => '@informationsSejourPackage',
+    'STRUCTURE' => '@informationsStructure',
+    'TERRITOIRE' => '@informationsTerritoire'
+  }
+
   def initialize(hash)
     self.attributes = hash
   end
@@ -33,6 +52,14 @@ class TouristicObject
       contact_details[c[:type][:libelleFr]] = c[:coordonnee] unless label == 'Fax'
     end
     contact_details
+  end
+
+  def information
+    specific_information = {}
+    unless @type.nil?
+      specific_information = instance_variable_get(SPECIFIC_INFOS[@type])
+    end
+    @informations.merge(specific_information)
   end
 
   def picture_url(default_url)
