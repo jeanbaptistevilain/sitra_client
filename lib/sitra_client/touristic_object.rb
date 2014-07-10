@@ -32,6 +32,10 @@ class TouristicObject
     @id.to_s
   end
 
+  def type
+    @type
+  end
+
   def title
     @nom[:libelleFr]
   end
