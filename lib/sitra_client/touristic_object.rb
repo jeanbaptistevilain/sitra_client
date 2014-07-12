@@ -53,7 +53,7 @@ class TouristicObject
     contact_entries = @informations[:moyensCommunication].nil? ? [] : @informations[:moyensCommunication]
     contact_entries.each do |c|
       label = c[:type][:libelleFr]
-      contact_details[c[:type][:libelleFr]] = c[:coordonnee] unless label == 'Fax'
+      contact_details[c[:type][:libelleFr]] = c[:coordonnee] unless label.downcase.include?('fax')
     end
     contact_details
   end
