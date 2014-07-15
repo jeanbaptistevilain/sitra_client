@@ -28,18 +28,19 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal 'my_detailed_description', touristic_object.details
   end
 
-  should 'populate contact details' do
+  should 'populate contact details for provided fields' do
     hash_result = {
         :informations => {
             :moyensCommunication => [
                 {:type => {:libelleFr => "Téléphone"}, :coordonnee => "0123456789"},
+                {:type => {:libelleFr => "Mél"}, :coordonnee => "my@email.fr"},
                 {:type => {:libelleFr => "Fax"}, :coordonnee => "9876543201"}
             ]
         }
     }
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_equal({'Téléphone' => '0123456789'}, touristic_object.contact)
+    assert_equal({'Téléphone' => '0123456789', 'Mél' => 'my@email.fr'}, touristic_object.contact(['Téléphone', 'Mél']))
   end
 
   should 'populate image details' do
