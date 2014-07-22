@@ -24,8 +24,21 @@ class TouristicObject
     'TERRITOIRE' => '@informationsTerritoire'
   }
 
+  DEFAULT_LIBELLE = :libelleFr
+
+  PHONE = 201
+  EMAIL = 204
+  WEBSITE = 205
+
   def initialize(hash)
     self.attributes = hash
+    @libelle = DEFAULT_LIBELLE
+  end
+
+  def set_locale(locale)
+    unless locale.nil?
+      @libelle = "libelle#{locale.capitalize}".to_sym
+    end
   end
 
   def id
@@ -37,24 +50,28 @@ class TouristicObject
   end
 
   def title
-    @nom[:libelleFr]
+    @nom[@libelle] || @nom[DEFAULT_LIBELLE]
   end
 
   def description
-    @presentation[:descriptifCourt][:libelleFr] unless @presentation[:descriptifCourt].nil?
+    if @presentation[:descriptifCourt]
+      @presentation[:descriptifCourt][@libelle] || @presentation[:descriptifCourt][DEFAULT_LIBELLE]
+    end
   end
 
   def details
-    @presentation[:descriptifDetaille][:libelleFr] unless @presentation[:descriptifDetaille].nil?
+    if @presentation[:descriptifDetaille]
+      @presentation[:descriptifDetaille][@libelle] || @presentation[:descriptifDetaille][DEFAULT_LIBELLE]
+    end
   end
 
-  def contact(fields = [])
+  def contact(types_ids = [])
     contact_details = {}
     contact_entries = @informations[:moyensCommunication].nil? ? [] : @informations[:moyensCommunication]
     contact_entries.each do |c|
-      label = c[:type][:libelleFr]
-      if fields.include?(label)
-        contact_details[c[:type][:libelleFr]] = c[:coordonnee] unless label.downcase.include?('fax')
+      if types_ids.include?(c[:type][:id])
+        label = c[:type][@libelle]
+        contact_details[label] = c[:coordonnee]
       end
     end
     contact_details
@@ -74,7 +91,7 @@ class TouristicObject
 
   def service_provider
     if @informationsActivite && @informationsActivite[:commerceEtServicePrestataire]
-      @informationsActivite[:commerceEtServicePrestataire][:nom][:libelleFr]
+      @informationsActivite[:commerceEtServicePrestataire][:nom][@libelle]
     elsif @informationsFeteEtManifestation
       @informationsFeteEtManifestation[:nomLieu]
     else
@@ -106,7 +123,7 @@ class TouristicObject
 
   def horaires
     if @ouverture && @ouverture[:periodeEnClair]
-      @ouverture[:periodeEnClair][:libelleFr]
+      @ouverture[:periodeEnClair][@libelle]
     end
   end
 
@@ -115,7 +132,7 @@ class TouristicObject
       if @descriptionTarif[:gratuit]
         return 'gratuit'
       elsif @descriptionTarif[:tarifsEnClair]
-        @descriptionTarif[:tarifsEnClair][:libelleFr]
+        @descriptionTarif[:tarifsEnClair][@libelle]
       end
     end
   end
@@ -123,21 +140,21 @@ class TouristicObject
   def population
     eligible_populations = []
     if @prestations && @prestations[:typesClientele]
-      eligible_populations += @prestations[:typesClientele].collect {|t| t[:libelleFr]}
+      eligible_populations += @prestations[:typesClientele].collect {|t| t[@libelle]}
     end
     eligible_populations.uniq
   end
 
   def adapted_tourism
-    @prestations && @prestations[:tourismesAdaptes] && @prestations[:tourismesAdaptes].collect {|t| t[:libelleFr]}
+    @prestations && @prestations[:tourismesAdaptes] && @prestations[:tourismesAdaptes].collect {|t| t[@libelle]}
   end
 
   def environments
-    @localisation && @localisation[:environnements] && @localisation[:environnements].collect {|e| e[:libelleFr]}
+    @localisation && @localisation[:environnements] && @localisation[:environnements].collect {|e| e[@libelle]}
   end
 
   def additional_criteria
-    @presentation && @presentation[:typologiesPromoSitra] && @presentation[:typologiesPromoSitra].collect {|t| t[:libelleFr]}
+    @presentation && @presentation[:typologiesPromoSitra] && @presentation[:typologiesPromoSitra].collect {|t| t[@libelle]}
   end
 
   private

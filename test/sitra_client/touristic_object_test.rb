@@ -32,15 +32,15 @@ class TouristicObjectTest < Test::Unit::TestCase
     hash_result = {
         :informations => {
             :moyensCommunication => [
-                {:type => {:libelleFr => "Téléphone"}, :coordonnee => "0123456789"},
-                {:type => {:libelleFr => "Mél"}, :coordonnee => "my@email.fr"},
-                {:type => {:libelleFr => "Fax"}, :coordonnee => "9876543201"}
+                {:type => {:libelleFr => "Téléphone", :id => 201}, :coordonnee => "0123456789"},
+                {:type => {:libelleFr => "Mél", :id => 204}, :coordonnee => "my@email.fr"},
+                {:type => {:libelleFr => "Fax", :id => 202}, :coordonnee => "9876543201"}
             ]
         }
     }
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_equal({'Téléphone' => '0123456789', 'Mél' => 'my@email.fr'}, touristic_object.contact(['Téléphone', 'Mél']))
+    assert_equal({'Téléphone' => '0123456789', 'Mél' => 'my@email.fr'}, touristic_object.contact([201, 204]))
   end
 
   should 'populate image details' do
@@ -153,4 +153,18 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal "my_service", touristic_object.information[:commerceEtServicePrestataire][:nom][:libelleFr]
   end
 
+  should 'default to fr locale' do
+    hash_result = {:presentation => {:descriptifCourt => {:libelleFr => "my_description_fr", :libelleEn => "my_description_en"}}}
+    touristic_object = TouristicObject.new(hash_result)
+
+    assert_equal 'my_description_fr', touristic_object.description
+  end
+
+  should 'use provided locale when available' do
+    hash_result = {:presentation => {:descriptifCourt => {:libelleFr => "my_description_fr", :libelleEn => "my_description_en"}}}
+    touristic_object = TouristicObject.new(hash_result)
+    touristic_object.set_locale('en')
+
+    assert_equal 'my_description_en', touristic_object.description
+  end
 end
