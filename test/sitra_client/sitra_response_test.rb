@@ -59,6 +59,8 @@ class SitraResponseTest < Test::Unit::TestCase
     sitra_response.append_line(json_response)
 
     touristic_objects = sitra_response.as_array
+
+    assert_equal 2, sitra_response.results_count
     assert_empty touristic_objects
 
   end

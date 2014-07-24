@@ -6,14 +6,16 @@ require 'logger'
 
 module SitraClient
 
-  DEFAULT_COUNT = 50
+  MAX_COUNT = 100
+
+  # Safety net
+  MAX_LOOPS = 5
 
   # Configuration defaults
   @config = {
       :base_url => 'http://api.sitra-tourisme.com/api/v001',
       :api_key => '',
-      :site_identifier => '',
-      :results_count => DEFAULT_COUNT
+      :site_identifier => ''
   }
 
   @valid_config_keys = @config.keys
@@ -28,16 +30,35 @@ module SitraClient
     @config
   end
 
-  def self.query(criteria = {})
-    response = SitraResponse.new
-    unless criteria.has_key?(:count)
-      criteria[:count] = @config[:results_count]
+  def self.query(criteria, all_results = false)
+    if all_results
+      loops = 0
+      criteria[:first] = 0
+      criteria[:count] = MAX_COUNT
+      response = get_response(criteria)
+      results = response.as_array
+      while response.results_count > results.length && loops < MAX_LOOPS
+        loops += 1
+        criteria[:first] += MAX_COUNT
+        results += get_response(criteria).as_array
+      end
+    else
+      response = get_response(criteria)
+      results = response.as_array
     end
+    results
+  end
+
+  private
+
+  def self.get_response(criteria)
+    response = SitraResponse.new
     query = SitraQuery.new(@config[:api_key], @config[:site_identifier], criteria)
     @logger.info "Search query : #{@config[:base_url]}/recherche/list-objets-touristiques?query=#{query.to_params}"
     open("#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{CGI.escape query.to_params}") { |f|
       f.each_line {|line| response.append_line(line)}
     }
+    @logger.info "Retrieved #{response.returned_count} of #{response.results_count} results"
     response
   end
 

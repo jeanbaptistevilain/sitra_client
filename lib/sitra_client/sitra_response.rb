@@ -6,14 +6,26 @@ class SitraResponse
 
   def initialize
     @json_response = ''
+    @response_hash = {}
   end
 
   def append_line(line)
     @json_response += line unless line.nil?
   end
 
+  def returned_count
+    [as_hash[:query][:count], results_count - as_hash[:query][:first]].min
+  end
+
+  def results_count
+    as_hash[:numFound]
+  end
+
   def as_hash
-    JSON.parse @json_response, :symbolize_names => true
+    if @response_hash.empty?
+      @response_hash = JSON.parse @json_response, :symbolize_names => true
+    end
+    @response_hash
   end
 
   def as_raw_json
@@ -21,11 +33,10 @@ class SitraResponse
   end
 
   def as_array
-    response = as_hash
-    if response[:objetsTouristiques].nil?
+    if as_hash[:objetsTouristiques].nil?
       results = []
     else
-      results = response[:objetsTouristiques].collect {|obj_hash| TouristicObject.new(obj_hash)}
+      results = as_hash[:objetsTouristiques].collect {|obj_hash| TouristicObject.new(obj_hash)}
     end
     results
   end
