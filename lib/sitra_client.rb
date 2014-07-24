@@ -6,11 +6,14 @@ require 'logger'
 
 module SitraClient
 
+  DEFAULT_COUNT = 50
+
   # Configuration defaults
   @config = {
       :base_url => 'http://api.sitra-tourisme.com/api/v001',
       :api_key => '',
-      :site_identifier => ''
+      :site_identifier => '',
+      :results_count => DEFAULT_COUNT
   }
 
   @valid_config_keys = @config.keys
@@ -27,6 +30,9 @@ module SitraClient
 
   def self.query(criteria = {})
     response = SitraResponse.new
+    unless criteria.has_key?(:count)
+      criteria[:count] = @config[:results_count]
+    end
     query = SitraQuery.new(@config[:api_key], @config[:site_identifier], criteria)
     @logger.info "Search query : #{@config[:base_url]}/recherche/list-objets-touristiques?query=#{query.to_params}"
     open("#{@config[:base_url]}/recherche/list-objets-touristiques?query=#{CGI.escape query.to_params}") { |f|
