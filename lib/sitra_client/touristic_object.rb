@@ -157,6 +157,14 @@ class TouristicObject
     @presentation && @presentation[:typologiesPromoSitra] && @presentation[:typologiesPromoSitra].collect {|t| t[@libelle]}
   end
 
+  def services
+    @prestations && @prestations[:services] && @prestations[:services].collect {|t| t[@libelle]}
+  end
+
+  def equipements
+    @prestations && @prestations[:equipements] && @prestations[:equipements].collect {|t| t[@libelle]}
+  end
+
   private
 
   def parse_geoloc_details
