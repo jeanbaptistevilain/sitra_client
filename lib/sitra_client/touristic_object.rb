@@ -108,7 +108,9 @@ class TouristicObject
   end
 
   def address
-    "#{address_details[:adresse1]}, #{address_details[:commune][:nom]}"
+    computed_address = ''
+    computed_address += "#{address_details[:adresse1]}, " unless address_details[:adresse1].nil?
+    computed_address + address_details[:commune][:nom]
   end
 
   def latitude
@@ -145,8 +147,8 @@ class TouristicObject
     eligible_populations.uniq
   end
 
-  def adapted_tourism
-    @prestations && @prestations[:tourismesAdaptes] && @prestations[:tourismesAdaptes].collect {|t| t[@libelle]}
+  def prestations(prestation_type)
+    @prestations && @prestations[prestation_type] && @prestations[prestation_type].collect {|t| t[@libelle]}
   end
 
   def environments
@@ -155,14 +157,6 @@ class TouristicObject
 
   def additional_criteria
     @presentation && @presentation[:typologiesPromoSitra] && @presentation[:typologiesPromoSitra].collect {|t| t[@libelle]}
-  end
-
-  def services
-    @prestations && @prestations[:services] && @prestations[:services].collect {|t| t[@libelle]}
-  end
-
-  def equipements
-    @prestations && @prestations[:equipements] && @prestations[:equipements].collect {|t| t[@libelle]}
   end
 
   private

@@ -125,11 +125,11 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal ['Familles'], touristic_object.population
   end
 
-  should 'populate adapted tourism fields' do
+  should 'populate prestations fields' do
     hash_result = {:prestations => {:tourismesAdaptes => [{:libelleFr => "Accessible en fauteuil roulant en autonomie"}]}}
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_true touristic_object.adapted_tourism.include?('Accessible en fauteuil roulant en autonomie')
+    assert_true touristic_object.prestations(:tourismesAdaptes).include?('Accessible en fauteuil roulant en autonomie')
   end
 
   should 'retrieve merged general and specific information' do
@@ -166,5 +166,9 @@ class TouristicObjectTest < Test::Unit::TestCase
     touristic_object.set_locale('en')
 
     assert_equal 'my_description_en', touristic_object.description
+  end
+
+  should 'populate services data' do
+
   end
 end
