@@ -159,6 +159,32 @@ class TouristicObject
     @presentation && @presentation[:typologiesPromoSitra] && @presentation[:typologiesPromoSitra].collect {|t| t[@libelle]}
   end
 
+  def resa
+    if @reservation
+      @reservation[:organismes]
+    end
+  end
+
+  def pdf_link
+    @multimedias
+  end
+
+  def reservation
+    if @reservation[:complement]
+      @reservation[:complement][:libelleFr] || @reservation[:complement][DEFAULT_LIBELLE]
+    end
+  end
+
+  def bonplan
+    if @presentation[:bonsPlans]
+      @presentation[:bonsPlans][@libelle] || @presentation[:bonsPlans][DEFAULT_LIBELLE]
+    end
+  end
+
+  def cpltaccueil
+    @prestations && @prestations[:complementAccueil] && @prestations[:complementAccueil][:libelleFr]
+  end
+
   private
 
   def parse_geoloc_details
