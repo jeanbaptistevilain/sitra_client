@@ -185,6 +185,10 @@ class TouristicObject
     @prestations && @prestations[:complementAccueil] && @prestations[:complementAccueil][:libelleFr]
   end
 
+  def accessibilite
+    @prestations && @prestations[:tourismesAdaptes] && @prestations[:tourismesAdaptes].collect {|t| t[@libelle]}
+  end
+
   private
 
   def parse_geoloc_details
