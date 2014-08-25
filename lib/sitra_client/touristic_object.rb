@@ -148,7 +148,21 @@ class TouristicObject
   end
 
   def prestations(prestation_type)
-    @prestations && @prestations[prestation_type] && @prestations[prestation_type].collect {|t| t[@libelle]}
+    presta = {}
+    @prestations && @prestations[prestation_type].each do |i|
+      value = i[@libelle]
+      if i[:familleCritere].nil?
+        key = 'Autre'
+      else
+        key = i[:familleCritere][:libelleFr]
+      end
+      if presta.has_key?(key)
+        presta[key] << value
+      else
+        presta.store(key,[value])
+      end
+    end
+    presta
   end
 
   def environments
