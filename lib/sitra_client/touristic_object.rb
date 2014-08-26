@@ -149,6 +149,7 @@ class TouristicObject
 
   def prestations(prestation_type)
     presta = {}
+    unless @prestations && @prestations[prestation_type].nil?
     @prestations && @prestations[prestation_type].each do |i|
       value = i[@libelle]
       if i[:familleCritere].nil?
@@ -161,6 +162,7 @@ class TouristicObject
       else
         presta.store(key,[value])
       end
+    end
     end
     presta
   end
