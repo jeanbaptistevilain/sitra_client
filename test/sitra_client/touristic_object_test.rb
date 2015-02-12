@@ -129,7 +129,7 @@ class TouristicObjectTest < Test::Unit::TestCase
     hash_result = {:prestations => {:tourismesAdaptes => [{:libelleFr => "Accessible en fauteuil roulant en autonomie"}]}}
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_true touristic_object.prestations(:tourismesAdaptes).include?('Accessible en fauteuil roulant en autonomie')
+    assert_true touristic_object.prestations(:tourismesAdaptes).values[0].include?('Accessible en fauteuil roulant en autonomie')
   end
 
   should 'retrieve merged general and specific information' do
@@ -168,7 +168,161 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal 'my_description_en', touristic_object.description
   end
 
-  should 'populate services data' do
+  should 'return predicate covering openings every day of the week' do
+    opening_hash = {:type => 'OUVERTURE_TOUS_LES_JOURS'}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
 
+    assert_equal true, predicate.call(Date.new(2015, 2, 8))
+    assert_equal true, predicate.call(Date.new(2015, 2, 9))
+    assert_equal true, predicate.call(Date.new(2015, 2, 10))
+    assert_equal true, predicate.call(Date.new(2015, 2, 11))
+    assert_equal true, predicate.call(Date.new(2015, 2, 12))
+    assert_equal true, predicate.call(Date.new(2015, 2, 13))
+    assert_equal true, predicate.call(Date.new(2015, 2, 14))
+  end
+
+  should 'return predicate covering openings all days of the week except one' do
+    opening_hash = {:type => 'OUVERTURE_SAUF', :ouverturesJournalieres => [{:jour => 'DIMANCHE'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal false, predicate.call(Date.new(2015, 2, 8))
+    assert_equal true, predicate.call(Date.new(2015, 2, 9))
+    assert_equal true, predicate.call(Date.new(2015, 2, 10))
+    assert_equal true, predicate.call(Date.new(2015, 2, 11))
+    assert_equal true, predicate.call(Date.new(2015, 2, 12))
+    assert_equal true, predicate.call(Date.new(2015, 2, 13))
+    assert_equal true, predicate.call(Date.new(2015, 2, 14))
+  end
+
+  should 'return predicate covering openings only on specified days' do
+    opening_hash = {:type => 'OUVERTURE_SEMAINE', :ouverturesJournalieres => [{:jour => 'LUNDI'}, {:jour => 'MERCREDI'}, {:jour => 'VENDREDI'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal false, predicate.call(Date.new(2015, 2, 8))
+    assert_equal true, predicate.call(Date.new(2015, 2, 9))
+    assert_equal false, predicate.call(Date.new(2015, 2, 10))
+    assert_equal true, predicate.call(Date.new(2015, 2, 11))
+    assert_equal false, predicate.call(Date.new(2015, 2, 12))
+    assert_equal true, predicate.call(Date.new(2015, 2, 13))
+    assert_equal false, predicate.call(Date.new(2015, 2, 14))
+  end
+
+  should 'return predicate covering all week days (alternative)' do
+    opening_hash = {:type => 'OUVERTURE_SEMAINE', :ouverturesJournalieres => [{:jour => 'TOUS'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal true, predicate.call(Date.new(2015, 2, 8))
+    assert_equal true, predicate.call(Date.new(2015, 2, 9))
+    assert_equal true, predicate.call(Date.new(2015, 2, 10))
+    assert_equal true, predicate.call(Date.new(2015, 2, 11))
+    assert_equal true, predicate.call(Date.new(2015, 2, 12))
+    assert_equal true, predicate.call(Date.new(2015, 2, 13))
+    assert_equal true, predicate.call(Date.new(2015, 2, 14))
+  end
+
+  should 'return predicate covering opening on a specific day of the month' do
+    opening_hash = {:type => 'OUVERTURE_MOIS', :ouverturesJourDuMois => [{:jour => 'LUNDI', :jourDuMois => 'D_2EME'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal false, predicate.call(Date.new(2015, 2, 2))
+    assert_equal false, predicate.call(Date.new(2015, 2, 8))
+    assert_equal true, predicate.call(Date.new(2015, 2, 9))
+    assert_equal false, predicate.call(Date.new(2015, 2, 10))
+    assert_equal false, predicate.call(Date.new(2015, 2, 11))
+    assert_equal false, predicate.call(Date.new(2015, 2, 12))
+    assert_equal false, predicate.call(Date.new(2015, 2, 13))
+    assert_equal false, predicate.call(Date.new(2015, 2, 14))
+    assert_equal false, predicate.call(Date.new(2015, 2, 16))
+  end
+
+  should 'return predicate covering openings on several days of the month' do
+    opening_hash = {:type => 'OUVERTURE_MOIS',
+                    :ouverturesJourDuMois => [{:jour => 'LUNDI', :jourDuMois => 'D_4EME'}, {:jour => 'MARDI', :jourDuMois => 'D_1ER'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal true, predicate.call(Date.new(2015, 2, 3))
+    assert_equal false, predicate.call(Date.new(2015, 2, 9))
+    assert_equal false, predicate.call(Date.new(2015, 2, 10))
+    assert_equal false, predicate.call(Date.new(2015, 2, 11))
+    assert_equal false, predicate.call(Date.new(2015, 2, 12))
+    assert_equal false, predicate.call(Date.new(2015, 2, 13))
+    assert_equal false, predicate.call(Date.new(2015, 2, 14))
+    assert_equal false, predicate.call(Date.new(2015, 2, 15))
+    assert_equal true, predicate.call(Date.new(2015, 2, 23))
+  end
+
+  should 'return predicate covering openings on the first week of the month' do
+    opening_hash = {:type => 'OUVERTURE_MOIS',
+                    :ouverturesJourDuMois => [{:jour => 'TOUS', :jourDuMois => 'D_1ER'}]}
+    predicate = TouristicObject.new({}).open_day_predicate(opening_hash)
+
+    assert_equal true, predicate.call(Date.new(2015, 2, 1))
+    assert_equal true, predicate.call(Date.new(2015, 2, 2))
+    assert_equal true, predicate.call(Date.new(2015, 2, 3))
+    assert_equal true, predicate.call(Date.new(2015, 2, 4))
+    assert_equal true, predicate.call(Date.new(2015, 2, 5))
+    assert_equal true, predicate.call(Date.new(2015, 2, 6))
+    assert_equal true, predicate.call(Date.new(2015, 2, 7))
+    assert_equal false, predicate.call(Date.new(2015, 2, 8))
+  end
+
+  should 'detect date ranges intersection' do
+    touristic_object = TouristicObject.new({})
+
+    assert_equal false, touristic_object.ranges_intersect(Date.new(2015, 1, 1), Date.new(2015, 1, 31), Date.new(2015, 2, 15), Date.new(2015, 2, 25))
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2015, 1, 1), Date.new(2015, 12, 31), Date.new(2015, 1, 15), Date.new(2015, 1, 25))
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2015, 1, 1), Date.new(2015, 1, 31), Date.new(2015, 1, 15), Date.new(2015, 2, 5))
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2015, 1, 20), Date.new(2015, 1, 25), Date.new(2015, 1, 15), Date.new(2015, 1, 27))
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2015, 1, 20), Date.new(2015, 1, 25), Date.new(2015, 1, 15), Date.new(2015, 1, 22))
+    assert_equal false, touristic_object.ranges_intersect(Date.new(2014, 1, 5), Date.new(2014, 12, 25), Date.new(2015, 1, 15), Date.new(2015, 1, 22), false)
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2014, 1, 5), Date.new(2014, 12, 25), Date.new(2015, 1, 15), Date.new(2015, 1, 22), true)
+    assert_equal true, touristic_object.ranges_intersect(Date.new(2012, 12, 25), Date.new(2013, 1, 15), Date.new(2015, 1, 8), Date.new(2015, 1, 14), true)
+  end
+
+  should 'return opening status for date with a single opening period' do
+    opening_hash = {:ouverture => {
+        :periodesOuvertures => [
+            {:dateDebut => '2014-1-1',
+             :dateFin => '2014-12-31',
+             :tousLesAns => true,
+             :type => 'OUVERTURE_MOIS',
+             :ouverturesJourDuMois => [{:jour => 'LUNDI', :jourDuMois => 'D_1ER'}]}
+        ]
+    }}
+    touristic_object = TouristicObject.new(opening_hash)
+
+    assert_equal true, touristic_object.open_on?('2015-2-2', '2015-2-2')
+    assert_equal true, touristic_object.open_on?('2015-2-1', '2015-2-5')
+    assert_equal true, touristic_object.open_on?('2015-3-1', '2015-3-10')
+    assert_equal true, touristic_object.open_on?('2016-3-1', '2016-3-10')
+    assert_equal false, touristic_object.open_on?('2015-2-9', '2015-2-9')
+    assert_equal false, touristic_object.open_on?('2015-2-3', '2015-2-10')
+  end
+
+  should 'return opening status for date with multiple opening period' do
+    opening_hash = {:ouverture => {
+        :periodesOuvertures => [{:dateDebut => '2014-1-1',
+                                 :dateFin => '2014-12-31',
+                                 :tousLesAns => true,
+                                 :type => 'OUVERTURE_MOIS',
+                                 :ouverturesJourDuMois => [{:jour => 'LUNDI', :jourDuMois => 'D_1ER'}]},
+                                {:dateDebut => '2015-1-1',
+                                 :dateFin => '2015-1-31',
+                                 :tousLesAns => false,
+                                 :type => 'OUVERTURE_SEMAINE',
+                                 :ouverturesJournalieres => [{:jour => 'LUNDI'}, {:jour => 'MARDI'}, {:jour => 'JEUDI'}]}]
+    }}
+    touristic_object = TouristicObject.new(opening_hash)
+
+    assert_equal true, touristic_object.open_on?('2015-2-2', '2015-2-2')
+    assert_equal true, touristic_object.open_on?('2015-2-1', '2015-2-5')
+    assert_equal true, touristic_object.open_on?('2015-3-1', '2015-3-10')
+    assert_equal true, touristic_object.open_on?('2016-3-1', '2016-3-10')
+    assert_equal true, touristic_object.open_on?('2015-1-5', '2016-1-5')
+    assert_equal true, touristic_object.open_on?('2015-1-12', '2015-1-12')
+    assert_equal true, touristic_object.open_on?('2015-1-6', '2015-1-16')
+    assert_equal true, touristic_object.open_on?('2015-1-8', '2015-1-8')
+    assert_equal false, touristic_object.open_on?('2015-2-9', '2015-2-9')
+    assert_equal false, touristic_object.open_on?('2015-2-3', '2015-2-10')
   end
 end
