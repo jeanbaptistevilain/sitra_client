@@ -7,7 +7,7 @@ class SitraQuery
 
   def initialize(api_key, site_identifier, criteria = {})
     @apiKey = api_key
-    @siteWebExportIdV1 = site_identifier
+    @projetId = site_identifier
     self.attributes = criteria
   end
 

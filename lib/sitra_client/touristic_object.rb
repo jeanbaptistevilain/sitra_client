@@ -76,7 +76,7 @@ class TouristicObject
     contact_entries.each do |c|
       if types_ids.include?(c[:type][:id])
         label = c[:type][@libelle]
-        contact_details[label] = c[:coordonnee]
+        contact_details[label] = c[:coordonnees][:fr]
       end
     end
     contact_details
@@ -91,12 +91,12 @@ class TouristicObject
   end
 
   def picture_url(default_url)
-    @imagePrincipale.nil? ? default_url : @imagePrincipale[:traductionFichiers][0][:url]
+    (@illustrations.nil? || @illustrations.empty?) ? default_url : @illustrations[0][:traductionFichiers][0][:url]
   end
 
   def service_provider
-    if @informationsActivite && @informationsActivite[:commerceEtServicePrestataire]
-      @informationsActivite[:commerceEtServicePrestataire][:nom][@libelle]
+    if @informationsActivite && @informationsActivite[:prestataireActivites]
+      @informationsActivite[:prestataireActivites][:nom][@libelle]
     elsif @informationsFeteEtManifestation
       @informationsFeteEtManifestation[:nomLieu]
     else
@@ -105,8 +105,8 @@ class TouristicObject
   end
 
   def address_details
-    if @informationsActivite && @informationsActivite[:commerceEtServicePrestataire]
-      @informationsActivite[:commerceEtServicePrestataire][:adresse]
+    if @informationsActivite && @informationsActivite[:prestataireActivites]
+      @informationsActivite[:prestataireActivites][:adresse]
     else
       @localisation[:adresse]
     end
@@ -284,10 +284,10 @@ class TouristicObject
   end
 
   def parse_geoloc_details
-    if @informationsActivite.nil? || @informationsActivite[:commerceEtServicePrestataire].nil?
+    if @informationsActivite.nil? || @informationsActivite[:prestataireActivites].nil?
       geoloc_details = @localisation[:geolocalisation]
     else
-      geoloc_details = @informationsActivite[:commerceEtServicePrestataire][:geolocalisation]
+      geoloc_details = @informationsActivite[:prestataireActivites][:geolocalisation]
     end
     geoloc_details
   end

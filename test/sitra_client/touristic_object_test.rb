@@ -32,9 +32,9 @@ class TouristicObjectTest < Test::Unit::TestCase
     hash_result = {
         :informations => {
             :moyensCommunication => [
-                {:type => {:libelleFr => "Téléphone", :id => 201}, :coordonnee => "0123456789"},
-                {:type => {:libelleFr => "Mél", :id => 204}, :coordonnee => "my@email.fr"},
-                {:type => {:libelleFr => "Fax", :id => 202}, :coordonnee => "9876543201"}
+                {:type => {:libelleFr => "Téléphone", :id => 201}, :coordonnees => {:fr => "0123456789"}},
+                {:type => {:libelleFr => "Mél", :id => 204}, :coordonnees => {:fr => "my@email.fr"}},
+                {:type => {:libelleFr => "Fax", :id => 202}, :coordonnees => {:fr => "9876543201"}}
             ]
         }
     }
@@ -44,7 +44,11 @@ class TouristicObjectTest < Test::Unit::TestCase
   end
 
   should 'populate image details' do
-    hash_result = {:imagePrincipale => {:traductionFichiers => [{:url => "my/image/url"}]}}
+    hash_result = {
+        :illustrations => [
+            {:type => "IMAGE", :traductionFichiers => [:url => "my/image/url"]}
+        ]
+    }
     touristic_object = TouristicObject.new(hash_result)
 
     assert_equal 'my/image/url', touristic_object.picture_url('default.png')
@@ -53,7 +57,7 @@ class TouristicObjectTest < Test::Unit::TestCase
   should 'populate address details' do
     hash_result = {
         :informationsActivite => {
-            :commerceEtServicePrestataire => {
+            :prestataireActivites => {
                 :nom => {:libelleFr => "my_service"},
                 :adresse => {:adresse1 => "my_address", :codePostal => "1234", :commune => {:nom => "my_city"}},
                 :geolocalisation => {:valide => true, :geoJson => {:coordinates => [0.1, 0.2]}}
@@ -137,11 +141,11 @@ class TouristicObjectTest < Test::Unit::TestCase
         :type => 'ACTIVITE',
         :informations => {
             :moyensCommunication => [
-                {:type => {:libelleFr => "Téléphone"}, :coordonnee => "0123456789"}
+                {:type => {:libelleFr => "Téléphone"}, :coordonnees => {:fr => "0123456789"}}
             ]
         },
         :informationsActivite => {
-            :commerceEtServicePrestataire => {
+            :prestataireActivites => {
                 :nom => {:libelleFr => "my_service"}
             }
         }
@@ -149,8 +153,8 @@ class TouristicObjectTest < Test::Unit::TestCase
 
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_equal "0123456789", touristic_object.information[:moyensCommunication][0][:coordonnee]
-    assert_equal "my_service", touristic_object.information[:commerceEtServicePrestataire][:nom][:libelleFr]
+    assert_equal "0123456789", touristic_object.information[:moyensCommunication][0][:coordonnees][:fr]
+    assert_equal "my_service", touristic_object.information[:prestataireActivites][:nom][:libelleFr]
   end
 
   should 'default to fr locale' do

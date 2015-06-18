@@ -13,7 +13,7 @@ module SitraClient
 
   # Configuration defaults
   @config = {
-      :base_url => 'http://api.sitra-tourisme.com/api/v001',
+      :base_url => 'http://api.sitra-tourisme.com/api/v002',
       :api_key => '',
       :site_identifier => ''
   }
