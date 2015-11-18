@@ -90,8 +90,9 @@ class TouristicObject
     @informations.merge(specific_information)
   end
 
-  def picture_url(default_url)
-    (@illustrations.nil? || @illustrations.empty?) ? default_url : @illustrations[0][:traductionFichiers][0][:url]
+  def pictures
+    (@illustrations.nil? || @illustrations.empty?) ? [{}] :
+        @illustrations.collect {|i| i[:traductionFichiers][0].keep_if {|k, v| k.to_s.start_with?('url')}}
   end
 
   def service_provider
@@ -202,7 +203,7 @@ class TouristicObject
     end
   end
 
-  def pdf_link
+  def multimedias
     @multimedias
   end
 

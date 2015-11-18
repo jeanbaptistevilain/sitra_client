@@ -46,12 +46,12 @@ class TouristicObjectTest < Test::Unit::TestCase
   should 'populate image details' do
     hash_result = {
         :illustrations => [
-            {:type => "IMAGE", :traductionFichiers => [:url => "my/image/url"]}
+            {:type => 'IMAGE', :traductionFichiers => [{:url => 'my/image/url', :urlListe => 'my/list/url', :urlFiche => 'my/details/url'}]}
         ]
     }
     touristic_object = TouristicObject.new(hash_result)
 
-    assert_equal 'my/image/url', touristic_object.picture_url('default.png')
+    assert_equal [{:url => 'my/image/url', :urlListe => 'my/list/url', :urlFiche => 'my/details/url'}], touristic_object.pictures
   end
 
   should 'populate address details' do

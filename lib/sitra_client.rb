@@ -31,6 +31,7 @@ module SitraClient
   end
 
   def self.query(criteria, all_results = false)
+    query_result = {}
     if all_results
       loops = 0
       criteria[:first] = 0
@@ -42,11 +43,15 @@ module SitraClient
         criteria[:first] += MAX_COUNT
         results += get_response(criteria).as_array
       end
+      query_result[:count] = response.results_count
+      query_result[:results] = results
     else
       response = get_response(criteria)
       results = response.as_array
+      query_result[:count] = response.results_count
+      query_result[:results] = results
     end
-    results
+    query_result
   end
 
   private
