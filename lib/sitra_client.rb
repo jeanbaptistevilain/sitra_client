@@ -2,6 +2,7 @@ require 'sitra_client/version'
 require 'sitra_client/sitra_query'
 require 'sitra_client/sitra_response'
 require 'open-uri'
+require 'json'
 require 'logger'
 
 module SitraClient
@@ -52,6 +53,16 @@ module SitraClient
       query_result[:results] = results
     end
     query_result
+  end
+
+  def self.selections
+    response = ''
+    query = SitraQuery.new(@config[:api_key], @config[:site_identifier])
+    @logger.info "Selections retrieval query : #{@config[:base_url]}/referentiel/selections?query=#{query.to_params}"
+    open("#{@config[:base_url]}/referentiel/selections?query=#{CGI.escape query.to_params}") { |f|
+      f.each_line {|line| response += line if line}
+    }
+    JSON.parse response, symbolize_names: true
   end
 
   private
