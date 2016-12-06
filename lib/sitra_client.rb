@@ -31,24 +31,24 @@ module SitraClient
     @config
   end
 
-  def self.query(criteria, all_results = false)
+  def self.query(criteria, all_results = false, aspect = nil)
     query_result = {}
     if all_results
       loops = 0
       criteria[:first] = 0
       criteria[:count] = MAX_COUNT
       response = get_response(criteria)
-      results = response.as_array
+      results = response.as_array(aspect)
       while response.results_count > results.length && loops < MAX_LOOPS
         loops += 1
         criteria[:first] += MAX_COUNT
-        results += get_response(criteria).as_array
+        results += get_response(criteria).as_array(aspect)
       end
       query_result[:count] = response.results_count
       query_result[:results] = results
     else
       response = get_response(criteria)
-      results = response.as_array
+      results = response.as_array(aspect)
       query_result[:count] = response.results_count
       query_result[:results] = results
     end

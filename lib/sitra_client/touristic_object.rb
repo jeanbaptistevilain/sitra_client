@@ -1,5 +1,7 @@
 # encoding: UTF-8
 require 'active_support/duration'
+require 'active_support/core_ext/object/deep_dup'
+require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/numeric/time'
 require 'active_support/core_ext/integer/time'
 require 'sitra_client/attribute_helper'
@@ -29,15 +31,41 @@ class TouristicObject
 
   DEFAULT_LIBELLE = :libelleFr
 
+  ASPECT_WINTER = 'HIVER'
+  ASPECT_SUMMER = 'ETE'
+  ASPECT_CHALLENGED = 'HANDICAP'
+  ASPECT_BUSINESS = 'TOURISME_AFFAIRES'
+  ASPECT_GROUPS = 'GROUPES'
+  ASPECT_ACTIVITIES = 'PRESTATAIRE_ACTIVITES'
+
   PHONE = 201
   EMAIL = 204
   WEBSITE = 205
 
   WEEKDAYS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
 
-  def initialize(hash)
-    self.attributes = hash
+  def initialize(hash, aspect = nil)
+    if aspect && hash[:aspects]
+      aspect_data = hash[:aspects].select {|a| a[:aspect] == aspect && !a[:champsAspect].blank?}.first
+      self.attributes = aspect_data ? aspect_hash(hash, aspect_data) : hash
+    else
+      self.attributes = hash
+    end
     @libelle = DEFAULT_LIBELLE
+  end
+
+  def aspect_hash(all_fields, aspect_fields)
+    all_data = all_fields.except(:aspects)
+    aspect_data = aspect_fields.except(:aspect, :champsAspect)
+    overrides = aspect_fields[:champsAspect]
+    overrides.each do |o|
+      path = o.split('.').map(&:to_sym)
+      if all_data.dig(path.first, *path[1..-1]) && aspect_fields.dig(path.first, *path[1..-1]).nil?
+        *keys, last_key = path
+        keys.inject(all_data, :fetch)[last_key] = nil
+      end
+    end
+    all_data.deep_merge(aspect_data)
   end
 
   def set_locale(locale)

@@ -32,11 +32,11 @@ class SitraResponse
     @json_response
   end
 
-  def as_array
+  def as_array(aspect = nil)
     if as_hash[:objetsTouristiques].nil?
       results = []
     else
-      results = as_hash[:objetsTouristiques].collect {|obj_hash| TouristicObject.new(obj_hash)}
+      results = as_hash[:objetsTouristiques].collect {|obj_hash| TouristicObject.new(obj_hash, aspect)}
     end
     results
   end
