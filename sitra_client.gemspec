@@ -24,4 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "shoulda"
   spec.add_runtime_dependency "rails", ">= 4.0"
   spec.add_runtime_dependency "json"
+  if RUBY_VERSION < '2.3'
+    spec.add_runtime_dependency "backport_dig"
+  end
 end
