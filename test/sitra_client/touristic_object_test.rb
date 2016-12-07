@@ -330,52 +330,53 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal false, touristic_object.open_on?('2015-2-3', '2015-2-10')
   end
 
-  should 'load overridden aspect values' do
-    hash = {
-        nom: {libelleFr: 'my_title'},
-        presentation: {
-            descriptifCourt: {libelleFr: 'my_description'},
-            descriptifDetaille: {libelleFr: 'my_detailed_description'}
-        },
-        ouverture: {
-          periodeEnClair: {libelleFr: 'my_opening_hours'},
-          periodesOuvertures: [
-              {dateDebut: '2014-1-1', dateFin: '2014-12-31', tousLesAns: true, type: 'OUVERTURE_MOIS'},
-              {dateDebut: '2015-1-1', dateFin: '2015-1-31', tousLesAns: false, type: 'OUVERTURE_SEMAINE'}
-          ]
-        },
-        aspects: [
-            {
-                aspect: 'HIVER',
-                champsAspect: ['presentation.descriptifCourt', 'presentation.descriptifDetaille', 'ouverture.periodesOuvertures'],
-                presentation: {
-                    descriptifCourt: {libelleFr: 'my_description hiver'}
-                },
-                ouverture: {
-                    periodesOuvertures: [
-                        {dateDebut: '2014-2-1', dateFin: '2014-4-30', tousLesAns: true, type: 'OUVERTURE_MOIS'}
-                    ]
-                },
-            }
-        ]
+  should 'populate informations hebergement collectif for provided fields' do
+    hash_results = {
+        informationsHebergementCollectif: {
+            labels: [{id: '1256'},
+                     {id: '5478'},
+                     {id: '7899'}]
+        }
     }
 
-    std_object = TouristicObject.new(hash)
-    winter_object = TouristicObject.new(hash.deep_dup, TouristicObject::ASPECT_WINTER)
+    touristic_object = TouristicObject.new(hash_results)
 
-    assert_equal 'my_title', std_object.title
-    assert_equal 'my_description', std_object.description
-    assert_equal 'my_detailed_description', std_object.details
-    assert_equal 'my_opening_hours', std_object.horaires
-    assert_equal [{dateDebut: '2014-1-1', dateFin: '2014-12-31', tousLesAns: true, type: 'OUVERTURE_MOIS'},
-                  {dateDebut: '2015-1-1', dateFin: '2015-1-31', tousLesAns: false, type: 'OUVERTURE_SEMAINE'}],
-        std_object.attributes['ouverture'][:periodesOuvertures]
-
-    assert_equal 'my_title', winter_object.title
-    assert_equal 'my_description hiver', winter_object.description
-    assert_nil winter_object.details
-    assert_equal 'my_opening_hours', winter_object.horaires
-    assert_equal [{dateDebut: '2014-2-1', dateFin: '2014-4-30', tousLesAns: true, type: 'OUVERTURE_MOIS'}],
-                 winter_object.attributes['ouverture'][:periodesOuvertures]
+    assert_equal('1256', touristic_object.certification[0])
+    assert_equal('5478', touristic_object.certification[1])
+    assert_equal('7899', touristic_object.certification[2])
+    assert_not_equal('5555', touristic_object.certification[2])
   end
+
+  should 'populate informations hebergement locatif for provided fields' do
+    hash_results = {
+        informationsHebergementLocatif: {
+            labels: [{id: '1256'},
+                     {id: '5478'},
+                     {id: '7899'}]
+        }
+    }
+
+    touristic_object = TouristicObject.new(hash_results)
+
+    assert_equal('1256', touristic_object.certification[0])
+    assert_equal('5478', touristic_object.certification[1])
+    assert_equal('7899', touristic_object.certification[2])
+    assert_not_equal('5555', touristic_object.certification[2])
+  end
+
+  should 'populate informations hebergement collectif or locatif for provided fields' do
+    hash_resutls = {
+        informationsHebergementCollectif: {
+            hebergementCollectifType: {
+                libelleFr: "Hébergement"
+            }
+        }
+    }
+
+    touristic_object = TouristicObject.new(hash_resutls)
+
+    assert_equal('Hébergement', touristic_object.sub_type)
+  end
+
+
 end

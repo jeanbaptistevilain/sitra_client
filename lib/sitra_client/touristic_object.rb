@@ -82,6 +82,14 @@ class TouristicObject
     @type
   end
 
+  def sub_type
+    if @informationsHebergementCollectif && @informationsHebergementCollectif[:hebergementCollectifType]
+      @informationsHebergementCollectif[:hebergementCollectifType][@libelle] || @informationsHebergementCollectif[:hebergementCollectifType][DEFAULT_LIBELLE]
+    else
+      @informationsHebergementLocatif[:hebergementLocatifType][@libelle] || @informationsHebergementLocatif[:hebergementLocatifType][DEFAULT_LIBELLE]
+    end
+  end
+
   def title
     @nom[@libelle] || @nom[DEFAULT_LIBELLE]
   end
@@ -293,6 +301,14 @@ class TouristicObject
       # Unsupported
     end
     is_eligible
+  end
+
+  def certification
+    if @informationsHebergementCollectif && @informationsHebergementCollectif[:labels]
+      @informationsHebergementCollectif[:labels].collect {|t| t[:id]}
+    else
+      @informationsHebergementLocatif[:labels].collect {|t| t[:id]}
+    end
   end
 
   private
