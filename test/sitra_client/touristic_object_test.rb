@@ -330,8 +330,8 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_equal false, touristic_object.open_on?('2015-2-3', '2015-2-10')
   end
 
-  should 'populate informations hebergement collectif for provided fields' do
-    hash_results = {
+  should 'populate cetification information for provided fields' do
+    hash_results = { type: "HEBERGEMENT_COLLECTIF",
         informationsHebergementCollectif: {
             labels: [{id: '1256'},
                      {id: '5478'},
@@ -347,21 +347,16 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_not_equal('5555', touristic_object.certification[2])
   end
 
-  should 'populate informations hebergement locatif for provided fields' do
-    hash_results = {
+  should 'not populate certification information if empty' do
+    hash_results = { type: 'HEBERGEMENT_LOCATIF',
         informationsHebergementLocatif: {
-            labels: [{id: '1256'},
-                     {id: '5478'},
-                     {id: '7899'}]
+            labels: []
         }
     }
 
     touristic_object = TouristicObject.new(hash_results)
 
-    assert_equal('1256', touristic_object.certification[0])
-    assert_equal('5478', touristic_object.certification[1])
-    assert_equal('7899', touristic_object.certification[2])
-    assert_not_equal('5555', touristic_object.certification[2])
+    assert_equal([], touristic_object.certification)
   end
 
   should 'return specific info of the touristic object' do

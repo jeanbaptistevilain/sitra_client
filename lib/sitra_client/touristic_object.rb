@@ -303,10 +303,10 @@ class TouristicObject
   end
 
   def certification
-    if @informationsHebergementCollectif && @informationsHebergementCollectif[:labels]
-      @informationsHebergementCollectif[:labels].collect {|t| t[:id]}
-    else
-      @informationsHebergementLocatif[:labels].collect {|t| t[:id]}
+    info_specific = instance_variable_get('@informations' + specific_info(true))
+
+    if info_specific && info_specific[:labels]
+      info_specific[:labels].collect {|t| t[:id]}
     end
   end
 
