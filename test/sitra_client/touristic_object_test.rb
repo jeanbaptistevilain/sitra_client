@@ -364,20 +364,39 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_not_equal('5555', touristic_object.certification[2])
   end
 
+  should 'return specific info of the touristic object' do
+    array_types = ['ACTIVITE', 'COMMERCE_ET_SERVICE', 'DEGUSTATION', 'DOMAINE_SKIABLE', 'EQUIPEMENT', 'FETE_ET_MANIFESTATION',
+                 'HEBERGEMENT_COLLECTIF', 'HEBERGEMENT_LOCATIF', 'HOTELLERIE', 'HOTELLERIE_PLEIN_AIR',
+                 'PATRIMOINE_CULTUREL', 'PATRIMOINE_NATUREL', 'RESTAURATION', 'SEJOUR_PACKAGE', 'STRUCTURE', 'TERRITOIRE']
+
+    expected = ['activite', 'commerceEtService', 'degustation', 'domaineSkiable', 'equipement', 'feteEtManifestation', 'hebergementCollectif',
+                'hebergementLocatif', 'hotellerie', 'hotelleriePleinAir', 'patrimoineCulturel', 'patrimoineNaturel', 'restauration',
+                'sejourPackage', 'structure', 'territoire']
+
+    results = []
+
+    array_types.each do |type|
+      hash_results = { type: type }
+      touristic_type = TouristicObject.new(hash_results)
+      results << touristic_type.specific_info
+    end
+
+    assert_equal expected, results
+  end
+
   should 'populate sub type label for provided fields' do
     hash_results = {
         type: 'HOTELLERIE',
-        informations: {id: 1},
         informationsHotellerie: {
             hotellerieType: {
-                libelleFr: 'Hébergement'
+                libelleFr: 'HotellerieLabel'
             }
         }
     }
 
     touristic_object = TouristicObject.new(hash_results)
 
-    assert_equal('Hébergement', touristic_object.sub_type)
+    assert_equal('HotellerieLabel', touristic_object.sub_type)
   end
 
 

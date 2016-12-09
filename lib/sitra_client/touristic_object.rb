@@ -10,25 +10,6 @@ class TouristicObject
 
   include AttributeHelper
 
-  SPECIFIC_INFOS = {
-    'ACTIVITE' => '@informationsActivite',
-    'COMMERCE_ET_SERVICE' => '@informationsCommerceEtService',
-    'DEGUSTATION' => '@informationsDegustation',
-    'DOMAINE_SKIABLE' => '@informationsDomaineSkiable',
-    'EQUIPEMENT' => '@informationsEquipement',
-    'FETE_ET_MANIFESTATION' => '@informationsFeteEtManifestation',
-    'HEBERGEMENT_COLLECTIF' => '@informationsHebergementCollectif',
-    'HEBERGEMENT_LOCATIF' => '@informationsHebergementLocatif',
-    'HOTELLERIE' => '@informationsHotellerie',
-    'HOTELLERIE_PLEIN_AIR' => '@informationsHotelleriePleinAir',
-    'PATRIMOINE_CULTUREL' => '@informationsPatrimoineCulturel',
-    'PATRIMOINE_NATUREL' => '@informationsPatrimoineNaturel',
-    'RESTAURATION' => '@informationsRestauration',
-    'SEJOUR_PACKAGE' => '@informationsSejourPackage',
-    'STRUCTURE' => '@informationsStructure',
-    'TERRITOIRE' => '@informationsTerritoire'
-  }
-
   DEFAULT_LIBELLE = :libelleFr
 
   ASPECT_WINTER = 'HIVER'
@@ -82,20 +63,27 @@ class TouristicObject
     @type
   end
 
-  def sub_type
-    if @type
-      type = @type.downcase.split('_')
-      type.each_index do |index|
-        if index > 0
-          type[index] = type[index].capitalize
-        end
+  def specific_info(capitalize = false)
+    type = @type.downcase.split('_')
+    type.each_index do |index|
+      if index > 0
+        type[index] = type[index].capitalize
       end
-      type = type.join('') + 'Type'
-      informations =  information
+    end
+    if capitalize
+      @specific_info = type.join('').capitalize
+    else
+      @specific_info = type.join('')
+    end
+  end
 
-      if informations && informations[type.to_s.to_sym]
-        informations[type.to_s.to_sym][@libelle] || informations[type.to_s.to_sym][DEFAULT_LIBELLE]
-      end
+  def sub_type
+    infos_label = '@informations' + specific_info(true)
+    type_label = specific_info + 'Type'
+
+    infos_type = instance_variable_get(infos_label)
+    if infos_type && infos_type[type_label.to_sym]
+      infos_type[type_label.to_sym][@libelle] || infos_type[type_label.to_sym][DEFAULT_LIBELLE]
     end
   end
 
@@ -130,7 +118,7 @@ class TouristicObject
   def information
     specific_information = {}
     unless @type.nil?
-      specific_information = instance_variable_get(SPECIFIC_INFOS[@type])
+      specific_information = instance_variable_get('@informations' + specific_info(true))
     end
     @informations.merge(specific_information)
   end
