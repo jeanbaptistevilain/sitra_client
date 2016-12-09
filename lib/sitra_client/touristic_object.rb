@@ -65,16 +65,18 @@ class TouristicObject
 
   def specific_info(capitalize = false)
     type = @type.downcase.split('_')
+
+    if capitalize
+      type[0] = type[0].capitalize
+    end
+
     type.each_index do |index|
       if index > 0
         type[index] = type[index].capitalize
       end
     end
-    if capitalize
-      @specific_info = type.join('').capitalize
-    else
-      @specific_info = type.join('')
-    end
+
+    @specific_info = type.join('')
   end
 
   def sub_type

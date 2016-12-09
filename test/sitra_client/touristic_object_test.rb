@@ -386,17 +386,17 @@ class TouristicObjectTest < Test::Unit::TestCase
 
   should 'populate sub type label for provided fields' do
     hash_results = {
-        type: 'HOTELLERIE',
-        informationsHotellerie: {
-            hotellerieType: {
-                libelleFr: 'HotellerieLabel'
+        type: 'HOTELLERIE_PLEIN_AIR',
+        informationsHotelleriePleinAir: {
+            hotelleriePleinAirType: {
+                libelleFr: 'label'
             }
         }
     }
 
     touristic_object = TouristicObject.new(hash_results)
 
-    assert_equal('HotellerieLabel', touristic_object.sub_type)
+    assert_equal('label', touristic_object.sub_type)
   end
 
 
