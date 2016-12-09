@@ -364,16 +364,18 @@ class TouristicObjectTest < Test::Unit::TestCase
     assert_not_equal('5555', touristic_object.certification[2])
   end
 
-  should 'populate informations hebergement collectif or locatif for provided fields' do
-    hash_resutls = {
-        informationsHebergementCollectif: {
-            hebergementCollectifType: {
-                libelleFr: "Hébergement"
+  should 'populate sub type label for provided fields' do
+    hash_results = {
+        type: 'HOTELLERIE',
+        informations: {id: 1},
+        informationsHotellerie: {
+            hotellerieType: {
+                libelleFr: 'Hébergement'
             }
         }
     }
 
-    touristic_object = TouristicObject.new(hash_resutls)
+    touristic_object = TouristicObject.new(hash_results)
 
     assert_equal('Hébergement', touristic_object.sub_type)
   end

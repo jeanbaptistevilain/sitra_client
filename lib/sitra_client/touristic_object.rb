@@ -83,10 +83,19 @@ class TouristicObject
   end
 
   def sub_type
-    if @informationsHebergementCollectif && @informationsHebergementCollectif[:hebergementCollectifType]
-      @informationsHebergementCollectif[:hebergementCollectifType][@libelle] || @informationsHebergementCollectif[:hebergementCollectifType][DEFAULT_LIBELLE]
-    else
-      @informationsHebergementLocatif[:hebergementLocatifType][@libelle] || @informationsHebergementLocatif[:hebergementLocatifType][DEFAULT_LIBELLE]
+    if @type
+      type = @type.downcase.split('_')
+      type.each_index do |index|
+        if index > 0
+          type[index] = type[index].capitalize
+        end
+      end
+      type = type.join('') + 'Type'
+      informations =  information
+
+      if informations && informations[type.to_s.to_sym]
+        informations[type.to_s.to_sym][@libelle] || informations[type.to_s.to_sym][DEFAULT_LIBELLE]
+      end
     end
   end
 
